@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "uplot": "^1.6.30",
+    "three": "^0.167.1",
+    "@react-three/fiber": "^8.17.7",
+    "@react-three/drei": "^9.112.0",
+    "@tanstack/react-virtual": "^3.10.8"
+  },
+  "devDependencies": {
+    "@types/three": "^0.167.1"
+  }
+}

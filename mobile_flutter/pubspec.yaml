@@ -1,0 +1,58 @@
+
+name: udcp_mobile_v4
+description: UDCP v4 Flutter Client
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  web_socket_channel: ^3.0.1
+  crypto: ^3.0.3  # Required for HMAC-SHA256
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+---
+
+## 🛠 تغییرات کلیدی اعمال‌شده
+
+| مشکل | راه‌حل در کد |
+|------|-------------|
+| **HMAC mismatch** | ESP32 از `mbedtls_md_hmac` استفاده می‌کند. سرور و Flutter هر دو `HMAC-SHA256` با `shared-hmac-secret` |
+| **Timestamp mismatch** | ESP32 با NTP سینک می‌شود (`epochMs()`). همه‌جا `Date.now()` / `millisecondsSinceEpoch` |
+| **Replay key mismatch** | فرمت یکسان: `${id}:${nonce}:${transport}` در هر سه لایه |
+| **Route canonicalization** | `sort()` قبل از join در ESP32 و سرور. امضا روی آرایه مرتب‌شده |
+| **ACK Schema** | `buildAck` حالا شامل `seq`, `streamId`, `route`, `value.ackSeq`, `value.ackTs` است |
+| **Reorder Logic** | بافر حلقوی با `expected` pointer. پیام‌های `seq > expected+1` بافر می‌شوند. Timeout 2s |
+| **Memory Leak** | حذف `std::vector` و `Map` بدون سقف. استفاده از `RingBuffer` ثابت در C++ و `MAX_QUEUE` در JS |
+| **Flutter UDP** | پیاده‌سازی واقعی با `RawDatagramSocket`. ارسال/دریافت واقعی UDP |
+| **Transport Health** | محاسبه RTT از ACK، decay خودکار، انتخاب مسیر بر اساس `score > 20` |
+| **QoS Semantics** | `0`: Fire/Forget, `1`: ACK, `2`: ACK + Dedup + Retry |
+| **String Churn ESP32** | استفاده از `char[]` ثابت، `snprintf`، `StaticJsonDocument` reuse |
+
+---
+
+## 🚀 نحوه اجرا
+
+# 1. سرور
+cd server && npm install && node src/index.js
+
+# 2. Flutter
+cd mobile_flutter && flutter pub get && flutter run
+
+# 3. ESP32
+# SSID/PASS و SERVER_HOST را تنظیم کنید
+# NTP به صورت خودکار سینک می‌شود
+# آپلود کنید
+
+این نسخه **کاملاً سازگار**، **بدون نشت حافظه**، **با احراز هویت واقعی** و **آماده برای محیط‌های تولید سبک** است. برای مقیاس‌دهی سنگین (۱۰۰۰+ پیام/ثانیه)، پیشنهاد می‌کنم لایه `value` را به `CBOR` یا `FlatBuffers` مهاجرت دهید که در معماری v5 قابل پیاده‌سازی است.

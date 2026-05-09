@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all;
+  }
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white;
+  }
+  .btn-outline {
+    @apply border border-gray-600 hover:bg-gray-800;
+  }
+  
+  .card {
+    @apply bg-gray-800 rounded-lg p-4 shadow-lg;
+  }
+  
+  .status-badge {
+    @apply px-2 py-1 rounded text-xs font-bold;
+  }
+  .status-online { @apply bg-green-600 text-white; }
+  .status-offline { @apply bg-red-600 text-white; }
+  .status-degraded { @apply bg-yellow-600 text-white; }
+}
